@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5/29 青春環島：四極點征途</title>
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --accent: #f39c12;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --food-color: #e67e22;
+            --done: #2ecc71;
+            --youth-gradient: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+        
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            margin: 0;
+            background-color: var(--bg);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* 標題與導覽 */
+       header {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 6rem 1rem; /* 增加高度讓照片更明顯 */
+            animation: fadeInDown 0.8s ease-out;
+            /* 第一張照片：聖誕大合照作為背景 */
+            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('畢業照/S__20799623_0.jpg'); 
+            background-size: cover;
+            background-position: center 50%; /* 稍微往上調一點，對準人臉 */
+            position: relative;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        header h1 { 
+            color: var(--accent); 
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+        }
+        header p { 
+            font-size: 1.1rem;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-around;
+            background: var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border-bottom: 3px solid var(--accent);
+        }
+        nav a {
+            padding: 15px 5px;
+            text-decoration: none;
+            color: #bbb;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex: 1;
+            text-align: center;
+            transition: 0.3s;
+        }
+        nav a.active {
+            color: white;
+            background: var(--youth-gradient);
+            transform: scale(1.05);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px 100px;
+        }
+
+        section { display: none; animation: fadeIn 0.5s ease-in-out; }
+        section.active { display: block; }
+
+        .day-block {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border-left: 8px solid var(--accent);
+            transition: transform 0.3s ease;
+        }
+        .day-block:hover { transform: translateY(-5px); }
+
+        .day-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .date-label { font-size: 0.85rem; color: #7f8c8d; font-weight: normal; }
+
+        .route-info {
+            background: #fff8ee;
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+            font-weight: 600;
+            color: #d35400;
+            border: 1px solid #ffeaa7;
+        }
+
+        /* 側欄與學士帽 */
+        .floating-cap {
+            position: fixed;
+            right: 20px;
+            bottom: 30px;
+            width: 70px;
+            height: 70px;
+            z-index: 2000;
+            cursor: pointer;
+            animation: float 3s ease-in-out infinite;
+        }
+        .floating-cap img { width: 100%; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); }
+        .floating-cap span {
+            position: absolute; top: -10px; right: 0;
+            background: #e74c3c; color: white; font-size: 0.6rem;
+            padding: 2px 6px; border-radius: 10px; white-space: nowrap;
+        }
+
+        .track-overlay {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 85%; max-width: 400px; height: 100%;
+            background: #1a1a1a; z-index: 3000;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            transition: 0.5s cubic-bezier(0.77, 0.2, 0.05, 1);
+            padding: 20px; color: white; overflow-y: auto;
+        }
+        .track-overlay.open { right: 0; }
+        .close-btn { font-size: 2rem; cursor: pointer; color: var(--accent); }
+
+        .milestone-item {
+            background: rgba(255,255,255,0.05); padding: 15px;
+            border-radius: 15px; border: 1px dashed #444;
+            margin-bottom: 15px; text-align: center;
+        }
+        .milestone-item.has-photo { border: 2px solid var(--done); background: rgba(46, 204, 113, 0.1); }
+        .photo-preview { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 10px; margin-top: 10px; }
+
+        .note-card { background: #fff5f5; border-left: 5px solid #e74c3c; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .food-btn { background: white; border: 2px solid var(--food-color); color: var(--food-color); padding: 8px 16px; border-radius: 50px; text-decoration: none; font-size: 0.85rem; display: inline-block; margin: 5px; transition: 0.2s; }
+        .food-btn:hover { background: var(--food-color); color: white; }
+        .important { color: #e74c3c; font-weight: bold; }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="floating-cap" onclick="toggleTrack()">
+    <img src="https://cdn-icons-png.flaticon.com/512/3074/3074058.png" alt="學士帽">
+    <span>我們的軌跡</span>
+</div>
+
+<div class="track-overlay" id="trackOverlay">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: var(--accent); margin: 0;">🗺️ 我們的軌跡</h2>
+        <span class="close-btn" onclick="toggleTrack()">&times;</span>
+    </div>
+    
+    <div class="milestone-item" id="side-west">
+        <h4 style="margin:0;">⬅️ 西：國聖燈塔</h4>
+        <p style="font-size: 0.8rem; color: #888;">尚未抵達</p>
+    </div>
+
+    <div class="milestone-item has-photo" id="side-south">
+        <h4 style="margin:0;">⬇️ 南：鵝鑾鼻燈塔</h4>
+        <img src="畢業照/S__20799610_0.jpg" class="photo-preview" alt="畢業合照示例">
+        <p style="font-size: 0.8rem; color: #2ecc71;">✅ 已解鎖：學士服大合照</p>
+    </div>
+
+    <div class="milestone-item" id="side-east">
+        <h4 style="margin:0;">➡️ 東：三貂角燈塔</h4>
+        <p style="font-size: 0.8rem; color: #888;">尚未抵達</p>
+    </div>
+
+    <div class="milestone-item" id="side-north">
+        <h4 style="margin:0;">⬆️ 北：富貴角燈塔</h4>
+        <p style="font-size: 0.8rem; color: #888;">尚未抵達</p>
+    </div>
+</div>
+
+<header id="mainHeader">
+    <h1>🎓 青春環島：四極點大滿貫</h1>
+    <p>2026.05.29 - 06.04 | 逆時針挑戰中</p>
+</header>
+
+<nav>
+    <a href="javascript:void(0)" onclick="openTab(event, 'schedule')" class="active">📅 行程</a>
+    <a href="javascript:void(0)" onclick="openTab(event, 'food')">😋 美食</a>
+    <a href="javascript:void(0)" onclick="openTab(event, 'checklist')">🎒 裝備</a>
+    <a href="javascript:void(0)" onclick="openTab(event, 'notes')">⚠️ 注意</a>
+</nav>
+
+<div class="container">
+    
+    <section id="schedule" class="active">
+        <div class="day-block">
+            <h3 class="day-title">Day 1 <span class="date-label">5/29 (四)</span></h3>
+            <div class="route-info">📍 元智大學 ➔ 台中</div>
+            <p>路線：苗栗/新竹休息 ➔ 台中市區</p>
+            <p>推薦：高美濕地、旱溪夜市</p>
+        </div>
+        <div class="day-block">
+            <h3 class="day-title">Day 2 <span class="date-label">5/30 (五)</span></h3>
+            <div class="route-info">📍 台中 ➔ 台南</div>
+            <p>重點：挑戰 <span class="important">西極點：國聖燈塔</span></p>
+            <p>推薦：漁光島夕照、花園夜市</p>
+        </div>
+        <div class="day-block">
+            <h3 class="day-title">Day 3 <span class="date-label">5/31 (六)</span></h3>
+            <div class="route-info">📍 台南 ➔ 墾丁</div>
+            <p>重點：挑戰 <span class="important">南極點：鵝鑾鼻燈塔</span></p>
+            <p class="important">📸 必做：學士服大合照！</p>
+        </div>
+        <div class="day-block">
+            <h3 class="day-title">Day 4 <span class="date-label">6/01 (日)</span></h3>
+            <div class="route-info">📍 墾丁 ➔ 台東</div>
+            <p>景點：最美車站-多良、太麻里櫻木平交道</p>
+        </div>
+        <div class="day-block">
+            <h3 class="day-title">Day 5 <span class="date-label">6/02 (一)</span></h3>
+            <div class="route-info">📍 台東 ➔ 花蓮</div>
+            <p>景點：三仙台、伯朗大道、東大門夜市</p>
+        </div>
+        <div class="day-block">
+            <h3 class="day-title">Day 6 <span class="date-label">6/03 (二)</span></h3>
+            <div class="route-info">📍 花蓮 ➔ 羅東</div>
+            <p>重點：挑戰 <span class="important">東極點：三貂角燈塔</span></p>
+            <p>景點：清水斷崖、羅東夜市</p>
+        </div>
+        <div class="day-block">
+            <h3 class="day-title">Day 7 <span class="date-label">6/04 (三)</span></h3>
+            <div class="route-info">📍 羅東 ➔ 元智大學</div>
+            <p>重點：挑戰 <span class="important">北極點：富貴角燈塔</span></p>
+            <p>最終站：平安回到桃園溫暖的家</p>
+        </div>
+    </section>
+
+    <section id="food">
+        <div class="day-block">
+            <h3>😋 沿途必吃清單</h3>
+            <div style="margin-bottom: 20px;">
+                <p><b>台南站：</b></p>
+                <a href="#" class="food-btn">🍜 文章牛肉湯</a>
+                <a href="#" class="food-btn">🍔 丹丹漢堡</a>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <p><b>嘉義/高雄站：</b></p>
+                <a href="#" class="food-btn">🍹 御香屋</a>
+                <a href="#" class="food-btn">🦆 鴨肉珍</a>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <p><b>東部站：</b></p>
+                <a href="#" class="food-btn">🎡 東大門夜市</a>
+                <a href="#" class="food-btn">🥟 卑南豬血湯</a>
+                <a href="#" class="food-btn">🍧 正氣路米苔目</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="checklist">
+        <div class="day-block">
+            <h3>🎒 出發前檢查</h3>
+            <p><input type="checkbox"> <b>🎓 學士服 (靈魂道具)</b></p>
+            <p><input type="checkbox"> 🌧️ 兩件式雨衣 (拒絕小飛俠)</p>
+            <p><input type="checkbox"> 🔋 行動電源 x2</p>
+            <p><input type="checkbox"> 🧤 袖套 / 防曬乳</p>
+            <p><input type="checkbox"> 🎧 藍牙耳機 (聽導航用)</p>
+            <p><input type="checkbox"> 🪪 證件 / 少量現金 / 提款卡</p>
+            <p><input type="checkbox"> 🛠️ 基本補胎工具 / 打氣筒</p>
+        </div>
+    </section>
+
+    <section id="notes">
+        <div class="note-card">
+            <h3>⛽ 加油策略</h3>
+            <p>進入<b>南迴公路</b>與<b>蘇花公路</b>前，務必加滿油。尤其是東部段，看到加油站建議就補滿。</p>
+        </div>
+        <div class="note-card">
+            <h3>🌧️ 天氣應對</h3>
+            <p>5月底正值梅雨季，行李務必使用<b>大塑膠袋進行內層防水</b>，防止衣物全濕。</p>
+        </div>
+        <div class="note-card">
+            <h3>🏍️ 行車安全</h3>
+            <p>蘇花公路砂石車多，切勿強行超車。保持距離，安全是回家唯一的路。</p>
+        </div>
+    </section>
+</div>
+
+<script>
+    // 切換分頁功能
+    function openTab(evt, tabName) {
+        var x = document.getElementsByTagName("section");
+        for (var i = 0; i < x.length; i++) { x[i].style.display = "none"; }
+        var tablinks = document.querySelectorAll("nav a");
+        for (var i = 0; i < tablinks.length; i++) { tablinks[i].classList.remove("active"); }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.classList.add("active");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 切換軌跡側邊欄
+    function toggleTrack() {
+        document.getElementById('trackOverlay').classList.toggle('open');
+    }
+
+    // 提示：你可以將 header 的背景圖換成你的聖誕合照
+    // 或是將軌跡中的圖片換成學士服合照
+</script>
+
+</body>
+</html>
